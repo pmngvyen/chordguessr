@@ -16,13 +16,12 @@ UPDATEMS = 30
 LABELUPDATEMS = 300
 HISTORYLENGTH = 12
 
-# ── Palette ───────────────────────────────────────────────────────────────────
-BG       = "#f7f7f8"
-SURFACE  = "#ffffff"
-BORDER   = "#e4e4e8"
-TEXT     = "#1a1a1a"
+BG = "#f7f7f8"
+SURFACE = "#ffffff"
+BORDER = "#e4e4e8"
+TEXT = "#1a1a1a"
 TEXT_DIM = "#9090a0"
-ACCENT   = "#5b6af0"   # soft indigo — the one pop of colour
+ACCENT = "#5b6af0"
 
 pg.setConfigOptions(antialias=True, foreground=TEXT_DIM, background=SURFACE)
 
@@ -56,8 +55,8 @@ class LiveVisualizer(QtWidgets.QWidget):
         self.setStyleSheet(f"QWidget {{ background:{BG}; color:{TEXT}; }}")
 
         self.recentchords = deque(maxlen=HISTORYLENGTH)
-        self.recentnotes  = deque(maxlen=HISTORYLENGTH)
-        self.recentconf   = deque(maxlen=HISTORYLENGTH)
+        self.recentnotes = deque(maxlen=HISTORYLENGTH)
+        self.recentconf = deque(maxlen=HISTORYLENGTH)
 
         self.lastlabelupdate = 0
         self.shownnotes = "—"
@@ -75,7 +74,6 @@ class LiveVisualizer(QtWidgets.QWidget):
         root.setContentsMargins(28, 24, 28, 20)
         root.setSpacing(16)
 
-        # ── Info row ──────────────────────────────────────────────────────────
         info_frame = QtWidgets.QFrame()
         info_frame.setStyleSheet(
             f"background:{SURFACE}; border:1px solid {BORDER}; border-radius:10px;"
@@ -121,7 +119,6 @@ class LiveVisualizer(QtWidgets.QWidget):
 
         root.addWidget(info_frame)
 
-        # ── Plots ─────────────────────────────────────────────────────────────
         self.waveplot = styled_plot("Waveform", "Sample")
         self.waveplot.setYRange(-1, 1)
         self.wavecurve = self.waveplot.plot(
@@ -157,11 +154,11 @@ class LiveVisualizer(QtWidgets.QWidget):
         step = max(1, len(x) // 2048)
         self.wavecurve.setData(x[::step])
 
-        window   = np.hanning(len(x))
-        xw       = x * window
+        window = np.hanning(len(x))
+        xw = x * window
         spectrum = np.fft.rfft(xw)
-        freqs    = np.fft.rfftfreq(len(xw), d=1.0 / SAMPLERATE)
-        mags     = np.abs(spectrum)
+        freqs = np.fft.rfftfreq(len(xw), d=1.0 / SAMPLERATE)
+        mags = np.abs(spectrum)
 
         valid = (freqs >= MINFREQ) & (freqs <= MAXFREQ)
         fplot = freqs[valid]
@@ -173,7 +170,7 @@ class LiveVisualizer(QtWidgets.QWidget):
         self.speccurve.setData(fplot, mplot)
 
         notenames, pitchclasses = detectnotes(freqs, mags)
-        stablepc    = smoothpc(pitchclasses)
+        stablepc = smoothpc(pitchclasses)
         stablenames = [pcname(pc) for pc in stablepc]
         chordname, confidence = guesschord(stablepc)
 
@@ -211,14 +208,14 @@ def main():
 
     pal = QtGui.QPalette()
     for role, color in [
-        (QtGui.QPalette.Window,          BG),
-        (QtGui.QPalette.WindowText,      TEXT),
-        (QtGui.QPalette.Base,            SURFACE),
+        (QtGui.QPalette.Window, BG),
+        (QtGui.QPalette.WindowText, TEXT),
+        (QtGui.QPalette.Base, SURFACE),
         (QtGui.QPalette.AlternateBase,   BG),
-        (QtGui.QPalette.Text,            TEXT),
-        (QtGui.QPalette.Button,          SURFACE),
-        (QtGui.QPalette.ButtonText,      TEXT),
-        (QtGui.QPalette.Highlight,       ACCENT),
+        (QtGui.QPalette.Text, TEXT),
+        (QtGui.QPalette.Button, SURFACE),
+        (QtGui.QPalette.ButtonText, TEXT),
+        (QtGui.QPalette.Highlight, ACCENT),
         (QtGui.QPalette.HighlightedText, "#ffffff"),
     ]:
         pal.setColor(role, QtGui.QColor(color))
@@ -231,11 +228,11 @@ def main():
     print("Default input device:", sd.default.device)
 
     stream = sd.InputStream(
-        samplerate=SAMPLERATE,
-        channels=CHANNELS,
-        dtype='float32',
-        blocksize=BLOCKSIZE,
-        callback=audiocb,
+        samplerate = SAMPLERATE,
+        channels = CHANNELS,
+        dtype = 'float32',
+        blocksize = BLOCKSIZE,
+        callback = audiocb,
     )
     stream.start()
 
